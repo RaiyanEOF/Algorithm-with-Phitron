@@ -1,0 +1,167 @@
+bfs_on_2d_grid.cpp
+#include<bits/stdc++.h>
+using namespace std;
+char grid[105][105];
+bool vis[105][105];
+int level[105][105];
+vector<pair<int,int>> d = {{-1,0},{1,0},{0,-1},{0,1}};
+int n,m;
+
+bool valid(int i, int j)
+{
+    if(i<0 || i>=n || j<0 || j>=m)
+        return false;
+    return true;
+}
+
+void bfs(int si, int sj)
+{
+    queue<pair<int,int>> q;
+    q.push({si,sj});
+    vis[si][sj] = true;
+    level[si][sj] = 0;
+    while(!q.empty())
+    {
+        pair<int,int> par = q.front();
+        q.pop();
+        int par_i = par.first;
+        int par_j = par.second;
+
+        for(int i=0;i<4;i++)
+        {
+            int ci = par_i + d[i].first;
+            int cj = par_j + d[i].second;
+            if(valid(ci,cj) && !vis[ci][cj] && grid[ci][cj]=='.')
+            {
+                q.push({ci,cj});
+                vis[ci][cj] = true;
+                level[ci][cj] = level[par_i][par_j] + 1;
+            }
+        }
+    }
+}
+
+int main()
+{
+    cin >> n >> m;
+    for(int i=0;i<n;i++)
+        for(int j=0;j<m;j++)
+            cin >> grid[i][j];
+
+    int si,sj,di,dj;
+    cin >> si >> sj >> di >> dj;
+    memset(vis,false,sizeof(vis));
+    memset(level,-1,sizeof(level));
+    bfs(si,sj);
+    cout << level[di][dj] << endl;
+    return 0;
+}
+dfs.cpp
+#include<bits/stdc++.h>
+using namespace std;
+vector<int> adj_list[1005];
+bool vis[1005];
+
+void dfs(int src)
+{
+    cout << src << " ";
+    vis[src] = true;
+    for(int child : adj_list[src])
+        if(!vis[child])
+            dfs(child);
+}
+
+int main()
+{
+    int n,e;
+    cin >> n >> e;
+    while(e--)
+    {
+        int a,b;
+        cin >> a >> b;
+        adj_list[a].push_back(b);
+        adj_list[b].push_back(a);
+    }
+    memset(vis,false,sizeof(vis));
+    dfs(0);
+    return 0;
+}
+dfs_on_2d_grid.cpp
+#include<bits/stdc++.h>
+using namespace std;
+char grid[105][105];
+bool vis[105][105];
+vector<pair<int,int>> d = {{-1,0},{1,0},{0,-1},{0,1}};
+int n,m;
+
+bool valid(int i, int j)
+{
+    if(i<0 || i>=n || j<0 || j>=m)
+        return false;
+    return true;
+}
+
+void dfs(int si, int sj)
+{
+    cout << si << " " << sj << endl;
+    vis[si][sj] = true;
+    for(int i=0;i<4;i++)
+    {
+        int ci = si + d[i].first;
+        int cj = sj + d[i].second;
+        if(valid(ci,cj) && !vis[ci][cj])
+            dfs(ci,cj);
+    }
+}
+
+int main()
+{
+    cin >> n >> m;
+    for(int i=0;i<n;i++)
+        for(int j=0;j<m;j++)
+            cin >> grid[i][j];
+
+    int si,sj;
+    cin >> si >> sj;
+    memset(vis,false,sizeof(vis));
+    dfs(si,sj);
+    return 0;
+}
+number_of_components.cpp
+#include<bits/stdc++.h>
+using namespace std;
+vector<int> adj_list[1005];
+bool vis[1005];
+
+void dfs(int src)
+{
+    vis[src] = true;
+    for(int child : adj_list[src])
+        if(!vis[child])
+            dfs(child);
+}
+
+int main()
+{
+    int n,e;
+    cin >> n >> e;
+    while(e--)
+    {
+        int a,b;
+        cin >> a >> b;
+        adj_list[a].push_back(b);
+        adj_list[b].push_back(a);
+    }
+    memset(vis,false,sizeof(vis));
+    int cnt = 0;
+    for(int i=0;i<n;i++)
+    {
+        if(vis[i]==false)
+        {
+            dfs(i);
+            cnt++;
+        }
+    }
+    cout << cnt << endl;
+    return 0;
+}
