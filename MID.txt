@@ -1,0 +1,218 @@
+TASK01
+SAME COMPONENT
+#include <bits/stdc++.h>
+using namespace std;
+const int dx[] = {-1, 1, 0, 0};
+const int dy[] = {0, 0, -1, 1};
+bool isValid(int x, int y, int N, int M, vector<vector<char>>& grid){
+    return x >= 0 && x < N && y >= 0 && y < M && grid[x][y] == '.';
+}
+bool bfs(int Si, int Sj, int Di, int Dj, int N, int M, vector<vector<char>>& grid) {
+    if(grid[Si][Sj] == '-' || grid[Di][Dj] == '-'){
+        return false;
+}           
+    vector<vector<bool>> visited(N, vector<bool>(M, false));
+    queue<pair<int, int>> q;
+    q.push({Si, Sj});
+    visited[Si][Sj] = true;    
+    while(!q.empty()){
+        auto [x, y] = q.front();
+        q.pop();      
+        if(x == Di && y == Dj){
+            return true;
+        }      
+        for(int i = 0; i < 4; i++){
+            int nx = x + dx[i], ny = y + dy[i];
+            if(isValid(nx, ny, N, M, grid) && !visited[nx][ny]){
+                visited[nx][ny] = true;
+                q.push({nx, ny});
+            }
+        }
+    }
+    return false;
+}
+int main(){
+    int N, M;
+    cin >> N >> M;   
+    vector<vector<char>> grid(N, vector<char>(M));
+    for(int i = 0; i < N; i++){
+        for(int j = 0; j < M; j++){
+            cin >> grid[i][j];
+        }
+    }    
+    int Si, Sj, Di, Dj;
+    cin >> Si >> Sj >> Di >> Dj;  
+    if(bfs(Si, Sj, Di, Dj, N, M, grid)){
+        cout << "YES" << endl;
+    } 
+    else{
+        cout << "NO" << endl;
+    }   
+    return 0;
+}
+TASK02
+AREA OF COMPONENT 
+#include <bits/stdc++.h>
+using namespace std;
+ vector<pair<int, int>> d = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+bool isValid(int x, int y, int N, int M, vector<vector<char>>& grid, vector<vector<bool>>& vis){
+    return x >= 0 && x < N && y >= 0 && y < M && grid[x][y] == '.' && !vis[x][y];
+}
+int bfs(int x, int y, int N, int M, vector<vector<char>>& grid, vector<vector<bool>>& vis){
+    queue<pair<int, int>> q;
+    q.push({x, y});
+    vis[x][y] = true;
+    int area = 0;   
+    while(!q.empty()){
+        auto [cx, cy] = q.front();
+        q.pop();
+        area++;       
+        for(int i = 0; i < 4; i++){
+            int nx = cx + d[i].first;
+            int ny = cy + d[i].second;
+            if(isValid(nx, ny, N, M, grid, vis)){
+                vis[nx][ny] = true;
+                q.push({nx, ny});
+            }
+        }
+    }
+    return area;
+}
+int findMinComponentArea(int N, int M, vector<vector<char>>& grid){
+    vector<vector<bool>> vis(N, vector<bool>(M, false));
+    int minArea = INT_MAX;
+    bool hasComponent = false;  
+    for(int i = 0; i < N; i++){
+        for(int j = 0; j < M; j++){
+            if (grid[i][j] == '.' && !vis[i][j]){
+                hasComponent = true;
+                minArea = min(minArea, bfs(i, j, N, M, grid, vis));
+            }
+        }
+    }
+    return hasComponent ? minArea : -1;
+}
+int main(){
+    int N, M;
+    cin >> N >> M;  
+    vector<vector<char>> grid(N, vector<char>(M));
+    for(int i = 0; i < N; i++) {
+        for(int j = 0; j < M; j++){
+            cin >> grid[i][j];
+        }
+    }   
+    cout << findMinComponentArea(N, M, grid) << endl;
+    return 0;
+}
+TASK03
+KNIGHT MOVES
+#include <bits/stdc++.h>
+using namespace std;
+bool vis[105][105];
+vector<pair<int,int>> d = {{-2, -1},{-2, 1},{2, -1},{2, 1},{-1, -2},{-1, 2},{1, -2},{1, 2}};
+int KnightMoves(int N,int M,int Ki,int Kj,int Qi,int Qj){
+    if (Ki==Qi && Kj==Qj){
+        return 0; 
+    }
+    memset(vis,false,sizeof(vis));    
+    queue<pair<int,int>> q;
+    q.push({Ki,Kj});
+    vis[Ki][Kj] = true;   
+    int steps = 0;
+    while(!q.empty()){
+        int size = q.size();
+        steps++;
+        while (size--){
+            auto [x, y] = q.front();
+            q.pop();
+            for(int i=0;i<8;i++){
+                int nx = x + d[i].first, ny = y + d[i].second;
+                if(nx>=0 && nx<N && ny>=0 && ny<M && !vis[nx][ny]){
+                    if(nx==Qi && ny==Qj){
+                        return steps; 
+                    }
+                    vis[nx][ny] = true;
+                    q.push({nx, ny});
+                }
+            }
+        }
+    }
+    return -1; 
+}
+int main(){
+    int T;
+    cin >> T;
+    while(T--){
+        int N, M, Ki, Kj, Qi, Qj;
+        cin >> N >> M >> Ki >> Kj >> Qi >> Qj;
+        cout << KnightMoves(N,M,Ki,Kj,Qi,Qj) << endl;
+    }
+    return 0;
+}
+TASK04
+MAZE
+#include <bits/stdc++.h>
+using namespace std;
+vector<pair<int, int>> d = {{0, 1}, {0, -1}, {-1, 0}, {1, 0}};
+char maze[1005][1005];
+pair<int, int> parent[1005][1005]; 
+bool vis[1005][1005]; 
+int N, M; 
+void bfs(int Si,int Sj,int Di,int Dj){
+    queue<pair<int, int>> q;
+    q.push({Si,Sj});
+    vis[Si][Sj] = true;
+    while (!q.empty()) {
+        auto [x, y] = q.front();
+        q.pop();
+        if (x==Di && y==Dj){
+            break;
+        } 
+        for (int i=0;i<4;i++){
+            int nx = x + d[i].first, ny = y + d[i].second;
+            if(nx >= 0 && nx < N && ny >= 0 && ny < M && !vis[nx][ny] && maze[nx][ny] != '#'){
+                vis[nx][ny] = true;
+                parent[nx][ny] = {x, y};
+                q.push({nx, ny});
+            }
+        }
+    }
+    if (!vis[Di][Dj]){
+        return;
+    }
+    int cx = Di, cy = Dj;
+    while(!(cx==Si && cy==Sj)){
+        auto [px, py] = parent[cx][cy];
+        if(maze[px][py] != 'R' && maze[px][py] != 'D')
+            maze[px][py] = 'X';
+        cx = px, cy = py;
+    }
+}
+int main(){
+    cin >> N >> M;
+    int Si = -1, Sj = -1, Di = -1, Dj = -1;
+    for(int i = 0; i < N; i++){
+        for(int j = 0; j < M; j++){
+            cin >> maze[i][j];
+            if(maze[i][j] == 'R'){
+                Si = i;
+                Sj = j;
+            }
+            if(maze[i][j] == 'D'){
+                Di = i;
+                Dj = j;
+            }
+        }
+    }
+    memset(vis, false, sizeof(vis));
+    if(Si != -1 && Sj != -1 && Di != -1 && Dj != -1){
+        bfs(Si, Sj, Di, Dj);
+    }
+    for(int i = 0; i < N; i++){
+        for(int j = 0; j < M; j++){
+            cout << maze[i][j];
+        }
+        cout << endl;
+    }
+    return 0;
+}
