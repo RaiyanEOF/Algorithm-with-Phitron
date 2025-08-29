@@ -1,50 +1,40 @@
-#include <bits/stdc++.h>
+#include<bits/stdc++.h>
 using namespace std;
-const int dx[] = {-1, 1, 0, 0};
-const int dy[] = {0, 0, -1, 1};
-bool isValid(int x, int y, int N, int M, vector<vector<char>>& grid){
-    return x >= 0 && x < N && y >= 0 && y < M && grid[x][y] == '.';
+int n,m;
+vector<vector<char>> grid;
+vector<pair<int,int>> d = {{0,1},{1,0},{0,-1},{0,1}};
+bool vis[1005][1005];
+bool isValid(int i, int k, vector<vector<char>>& grid){
+    return i >= 0 && i < n && k >= 0 && k < m && grid[i][k] == '.';
 }
-bool bfs(int Si, int Sj, int Di, int Dj, int N, int M, vector<vector<char>>& grid) {
-    if(grid[Si][Sj] == '-' || grid[Di][Dj] == '-'){
-        return false;
-}           
-    vector<vector<bool>> visited(N, vector<bool>(M, false));
-    queue<pair<int, int>> q;
-    q.push({Si, Sj});
-    visited[Si][Sj] = true;    
-    while(!q.empty()){
-        auto [x, y] = q.front();
-        q.pop();      
-        if(x == Di && y == Dj){
-            return true;
-        }      
-        for(int i = 0; i < 4; i++){
-            int nx = x + dx[i], ny = y + dy[i];
-            if(isValid(nx, ny, N, M, grid) && !visited[nx][ny]){
-                visited[nx][ny] = true;
-                q.push({nx, ny});
-            }
+bool dfs(int si,int sk, int Di, int Dk, vector<vector<char>>& grid){
+    if(si == Di && sk == Dk)
+        return true;  
+    vis[si][sk] = true;
+    for(int i=0;i<4;i++){
+        int ci = si + d[i].first;
+        int ck = sk + d[i].second;
+        if(isValid(ci,ck,grid) && !vis[ci][ck]){
+            if(dfs(ci,ck,Di,Dk,grid))  
+                return true;
         }
     }
-    return false;
+    return false;  
 }
 int main(){
-    int N, M;
-    cin >> N >> M;   
-    vector<vector<char>> grid(N, vector<char>(M));
-    for(int i = 0; i < N; i++){
-        for(int j = 0; j < M; j++){
-            cin >> grid[i][j];
-        }
-    }    
-    int Si, Sj, Di, Dj;
-    cin >> Si >> Sj >> Di >> Dj;  
-    if(bfs(Si, Sj, Di, Dj, N, M, grid)){
+    cin >> n >> m;
+    grid.resize(n, vector<char>(m)); 
+    for(int i=0;i<n;i++){
+        for(int k=0;k<m;k++)
+            cin >> grid[i][k];   
+    }
+    int si,sk,di,dk;
+    cin >> si >> sk >> di >> dk;
+    memset(vis,false,sizeof(vis));
+    if(dfs(si,sk,di,dk,grid))
         cout << "YES" << endl;
-    } 
-    else{
-        cout << "NO" << endl;
-    }   
+    else 
+        cout << "NO" << endl; 
+
     return 0;
 }
