@@ -1,52 +1,51 @@
 #include <bits/stdc++.h>
 using namespace std;
- vector<pair<int, int>> d = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-bool isValid(int x, int y, int N, int M, vector<vector<char>>& grid, vector<vector<bool>>& vis){
-    return x >= 0 && x < N && y >= 0 && y < M && grid[x][y] == '.' && !vis[x][y];
+int N, M;
+vector<pair<int, int>> d = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+vector<vector<char>> grid;
+vector<vector<bool>> vis;
+bool isValid(int i, int j) {
+    return i >= 0 && i < N && j >= 0 && j < M && grid[i][j] == '.' && !vis[i][j];
 }
-int bfs(int x, int y, int N, int M, vector<vector<char>>& grid, vector<vector<bool>>& vis){
-    queue<pair<int, int>> q;
-    q.push({x, y});
-    vis[x][y] = true;
-    int area = 0;   
-    while(!q.empty()){
-        auto [cx, cy] = q.front();
-        q.pop();
-        area++;       
-        for(int i = 0; i < 4; i++){
-            int nx = cx + d[i].first;
-            int ny = cy + d[i].second;
-            if(isValid(nx, ny, N, M, grid, vis)){
-                vis[nx][ny] = true;
-                q.push({nx, ny});
-            }
+int dfs(int si, int sk){
+    vis[si][sk] = true;
+    int area = 1;  
+    for (int t=0;t<4;t++){
+        int ci = si + d[t].first;
+        int ck = sk + d[t].second;
+        if(isValid(ci, ck)){
+            area += dfs(ci, ck);
         }
     }
     return area;
 }
-int findMinComponentArea(int N, int M, vector<vector<char>>& grid){
-    vector<vector<bool>> vis(N, vector<bool>(M, false));
+int findMinComponentArea(){
     int minArea = INT_MAX;
-    bool hasComponent = false;  
-    for(int i = 0; i < N; i++){
-        for(int j = 0; j < M; j++){
-            if (grid[i][j] == '.' && !vis[i][j]){
+    bool hasComponent = false;
+    for(int i=0;i<N;i++){
+        for(int j=0;j<M;j++){
+            if(grid[i][j] == '.' && !vis[i][j]){
                 hasComponent = true;
-                minArea = min(minArea, bfs(i, j, N, M, grid, vis));
+                int area = dfs(i,j);
+                minArea = min(minArea,area);
             }
         }
     }
-    return hasComponent ? minArea : -1;
+    if(hasComponent){
+        return minArea;
+    } else {
+        return -1;
+    }
 }
-int main(){
-    int N, M;
-    cin >> N >> M;  
-    vector<vector<char>> grid(N, vector<char>(M));
-    for(int i = 0; i < N; i++) {
-        for(int j = 0; j < M; j++){
+int main() {
+    cin >> N >> M;
+    grid.resize(N, vector<char>(M));
+    vis.resize(N, vector<bool>(M, false));
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < M; j++) {
             cin >> grid[i][j];
         }
-    }   
-    cout << findMinComponentArea(N, M, grid) << endl;
+    }
+    cout << findMinComponentArea() << endl;
     return 0;
 }
